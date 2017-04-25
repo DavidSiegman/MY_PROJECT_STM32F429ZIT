@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F429xx</Define>
               <Undefine></Undefine>
-              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS</IncludePath>
+              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -472,9 +472,23 @@
         </Group>
         <Group>
           <GroupName>LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\LCD\lcd.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>SPI</GroupName>
+          <Files>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\SPI\spi.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
