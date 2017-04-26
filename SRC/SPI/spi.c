@@ -61,13 +61,13 @@ void SPI5_INIT(void)
 }
 void SPI5_SendByte(unsigned char byte)
 {
-	SPI5->DR = (unsigned char)(byte);
+	*((__IO uint8_t*)&(SPI5->DR)) = (__IO uint8_t)(byte);
 	while(!(SPI5->SR & SPI_SR_TXE));
 }
 unsigned char SPI5_ReadByte(void)
 {
 	while(!(SPI5->SR & SPI_SR_RXNE));
-	return *(unsigned char*)(SPI5->DR);
+	return *((__IO uint8_t *)&(SPI5->DR));
 }
 void SPI5_Enable(void)
 {
