@@ -26,7 +26,7 @@ void LCD_INIT(void)
 	LCD_DCX_PORT->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << LCD_DCX_PIN*2);
 	
 	/* Configure LCD */
-	/*
+	
   ili9341_WriteReg(0xCA);
   ili9341_WriteData(0xC3);
   ili9341_WriteData(0x08);
@@ -137,7 +137,7 @@ void LCD_INIT(void)
   ili9341_WriteData(0x28);
   ili9341_WriteData(0x2F);
   ili9341_WriteData(0x0F);
-	*/
+	
   LCD_Delay(1000);
   ili9341_WriteReg(LCD_SLEEP_OUT);
   LCD_Delay(200);

@@ -57,7 +57,7 @@ void SPI5_INIT(void)
 	SPI5->CR1 |= SPI_CR1_SSI;
 	// APB2 CLK = 90 MHz
 	SPI5->CR1 &= ~SPI_CR1_BR_Msk;
-	SPI5->CR1 |= (3 << SPI_CR1_BR_Pos); //90 MHz / 16 = 5.625 MHz
+	SPI5->CR1 |= (2 << SPI_CR1_BR_Pos); //90 MHz / 16 = 5.625 MHz
 }
 void SPI5_SendByte(unsigned char byte)
 {
