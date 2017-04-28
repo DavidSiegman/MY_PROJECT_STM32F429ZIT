@@ -1,13 +1,16 @@
 #ifndef __LCD_H 
 #define __LCD_H
 
-#include "stm32f4xx.h"
+#include "stm32f429xx.h"
 
 #define LCD_CSX_PORT GPIOC
-#define LCD_CSX_PIN  2
+#define LCD_CSX_PIN  2U
+
+#define MEM_CSX_PORT GPIOC
+#define MEM_CSX_PIN  3U
 
 #define LCD_DCX_PORT GPIOD
-#define LCD_DCX_PIN  13
+#define LCD_DCX_PIN  13U
 
 #define ILI9341_ID                  0x9341
 

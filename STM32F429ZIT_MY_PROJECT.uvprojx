@@ -10,7 +10,6 @@
       <TargetName>STM32F429ZIT_MY_PROJECT</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>5060422::V5.06 update 4 (build 422)::ARMCC</pArmCC>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
@@ -136,8 +135,8 @@
             <Capability>1</Capability>
             <DriverSelection>4100</DriverSelection>
           </Flash1>
-          <bUseTDR>0</bUseTDR>
-          <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
+          <bUseTDR>1</bUseTDR>
+          <Flash2>BIN\UL2CM3.DLL</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
@@ -314,7 +313,7 @@
             <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>1</OneElfS>
+            <OneElfS>0</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -334,9 +333,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F429xx</Define>
+              <Define>STM32F429xx,STM32F429X</Define>
               <Undefine></Undefine>
-              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD</IncludePath>
+              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD;.\INC\STARTUP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

@@ -7,8 +7,8 @@ void SPI5_INIT(void)
 	// ==================================================================================================
 	int index = 0;
 	
-	RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOFRST;
-	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOFRST;
+	//RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOFRST;
+	//RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOFRST;
 	RCC->AHB1ENR  |= RCC_AHB1ENR_GPIOFEN;
 	
 	// SPI5_SCK_PIN Initialisation ================================================================== AF5
@@ -63,6 +63,7 @@ void SPI5_SendByte(unsigned char byte)
 {
 	*((__IO uint8_t*)&(SPI5->DR)) = (__IO uint8_t)(byte);
 	while(!(SPI5->SR & SPI_SR_TXE));
+	while((SPI5->SR & SPI_SR_BSY));
 }
 unsigned char SPI5_ReadByte(void)
 {

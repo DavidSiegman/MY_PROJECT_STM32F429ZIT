@@ -1,7 +1,7 @@
 #ifndef __SPI_H 
 #define __SPI_H
 
-#include "stm32f4xx.h"
+#include "stm32f429xx.h"
 
 #define SPI5_SCK_PORT  GPIOF
 #define SPI5_MISO_PORT GPIOF

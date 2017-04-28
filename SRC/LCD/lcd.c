@@ -3,12 +3,12 @@
 
 void LCD_INIT(void)
 {
-	RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOCRST;
-	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOCRST;
+	//RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOCRST;
+	//RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOCRST;
 	RCC->AHB1ENR  |= RCC_AHB1ENR_GPIOCEN;
 	
-	RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIODRST;
-	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIODRST;
+	//RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIODRST;
+	//RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIODRST;
 	RCC->AHB1ENR  |= RCC_AHB1ENR_GPIODEN;
 	
 	// LCD_CSX_PIN Initialisation ================================================================== OUT
@@ -17,14 +17,23 @@ void LCD_INIT(void)
 	
 	LCD_CSX_PORT->OSPEEDR &= ~(GPIO_MODER_MODE0_Msk << LCD_CSX_PIN*2);
 	LCD_CSX_PORT->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << LCD_CSX_PIN*2);
+	LCD_CSX_PORT->BSRR    |= (1 << LCD_CSX_PIN);
 	
-	// LCD_CSX_PIN Initialisation ================================================================== OUT
+	// LCD_DCX_PIN Initialisation ================================================================== OUT
 	LCD_DCX_PORT->MODER &= ~(GPIO_MODER_MODE0_Msk << LCD_DCX_PIN*2);
 	LCD_DCX_PORT->MODER |=  (GPIO_MODER_MODE0_0 << LCD_DCX_PIN*2);
 	
 	LCD_DCX_PORT->OSPEEDR &= ~(GPIO_MODER_MODE0_Msk << LCD_DCX_PIN*2);
 	LCD_DCX_PORT->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << LCD_DCX_PIN*2);
+	LCD_DCX_PORT->BSRR   |= (1 << LCD_DCX_PIN);
 	
+	// MEM_CSX_PIN Initialisation ================================================================== OUT
+	MEM_CSX_PORT->MODER &= ~(GPIO_MODER_MODE0_Msk << MEM_CSX_PIN*2);
+	MEM_CSX_PORT->MODER |=  (GPIO_MODER_MODE0_0 << MEM_CSX_PIN*2);
+	
+	MEM_CSX_PORT->OSPEEDR &= ~(GPIO_MODER_MODE0_Msk << MEM_CSX_PIN*2);
+	MEM_CSX_PORT->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << MEM_CSX_PIN*2);
+	MEM_CSX_PORT->BSRR    |= (1 << MEM_CSX_PIN);
 	/* Configure LCD */
 	
   ili9341_WriteReg(0xCA);
@@ -152,11 +161,12 @@ void LCD_MCU_Read_Comand(unsigned char* parameters,unsigned char comand, unsigne
 	SPI5_BIDI_Enable();
 	SPI5_BIDIO_Enable();
 	SPI5_Enable();
-	LCD_CSX_PORT->ODR &= ~LCD_CSX_PIN;
-	LCD_DCX_PORT->ODR &= ~LCD_DCX_PIN;
+	LCD_CSX_PORT->BSRR    |= (1 << (LCD_CSX_PIN+16));
+	LCD_DCX_PORT->BSRR    |= (1 << (LCD_DCX_PIN+16));
+
 	SPI5_SendByte(comand);
 	
-	LCD_DCX_PORT->ODR |= LCD_DCX_PIN;
+	LCD_DCX_PORT->BSRR    |= (1 << LCD_DCX_PIN);
 	SPI5_Disable();
 	SPI5_BIDIO_Disable();
 	SPI5_Enable();
@@ -168,8 +178,8 @@ void LCD_MCU_Read_Comand(unsigned char* parameters,unsigned char comand, unsigne
 		*(parameters + i) = SPI5_ReadByte();
 		//LCD_CSX_PORT->ODR |= LCD_CSX_PIN;
 	}
-	LCD_DCX_PORT->ODR |=  LCD_DCX_PIN;
-	LCD_CSX_PORT->ODR |=  LCD_CSX_PIN;
+	LCD_CSX_PORT->BSRR    |= (1 << LCD_CSX_PIN);
+	LCD_DCX_PORT->BSRR    |= (1 << LCD_DCX_PIN);
 	SPI5_Disable();
 }
 void ili9341_WriteReg(unsigned char comand)
@@ -178,12 +188,12 @@ void ili9341_WriteReg(unsigned char comand)
 	SPI5_BIDIO_Enable();
 	SPI5_Enable();
 	
-	LCD_DCX_PORT->ODR &= ~LCD_DCX_PIN;
-	LCD_CSX_PORT->ODR &= ~LCD_CSX_PIN;
+	LCD_CSX_PORT->BSRR    |= (1 << (LCD_CSX_PIN+16));
+	LCD_DCX_PORT->BSRR    |= (1 << (LCD_DCX_PIN+16));
 
 	SPI5_SendByte(comand);
 
-	LCD_CSX_PORT->ODR |=  LCD_CSX_PIN;
+	LCD_CSX_PORT->BSRR    |= (1 << LCD_CSX_PIN);
 	SPI5_Disable();
 }
 void ili9341_WriteData(unsigned char comand)
@@ -192,12 +202,12 @@ void ili9341_WriteData(unsigned char comand)
 	SPI5_BIDIO_Enable();
 	SPI5_Enable();
 	
-	LCD_DCX_PORT->ODR |= LCD_DCX_PIN;
-	LCD_CSX_PORT->ODR &= ~LCD_CSX_PIN;
+	LCD_DCX_PORT->BSRR    |= (1 << LCD_DCX_PIN);
+	LCD_CSX_PORT->BSRR    |= (1 << (LCD_CSX_PIN+16));
 
 	SPI5_SendByte(comand);
 
-	LCD_CSX_PORT->ODR |=  LCD_CSX_PIN;
+	LCD_CSX_PORT->BSRR    |= (1 << LCD_CSX_PIN);
 	SPI5_Disable();
 }
 void LCD_Delay(int index)
