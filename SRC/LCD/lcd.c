@@ -64,12 +64,14 @@ void LCD_INIT(void)
   ili9341_WriteReg(LCD_DTCB);
   ili9341_WriteData(0x00);
   ili9341_WriteData(0x00);
+	ili9341_WriteReg(LCD_DFC);
+  ili9341_WriteData(0x01);
+  ili9341_WriteData(0x8F);
+  ili9341_WriteData(0x27);
+  ili9341_WriteData(0x04);
   ili9341_WriteReg(LCD_FRMCTR1);
   ili9341_WriteData(0x00);
   ili9341_WriteData(0x1B);
-  ili9341_WriteReg(LCD_DFC);
-  ili9341_WriteData(0x0A);
-  ili9341_WriteData(0xA2);
   ili9341_WriteReg(LCD_POWER1);
   ili9341_WriteData(0x10);
   ili9341_WriteReg(LCD_POWER2);
@@ -85,32 +87,34 @@ void LCD_INIT(void)
   ili9341_WriteData(0x00);
   ili9341_WriteReg(LCD_RGB_INTERFACE);
   ili9341_WriteData(0xC2);
-  ili9341_WriteReg(LCD_DFC);
-  ili9341_WriteData(0x0A);
-  ili9341_WriteData(0xA7);
-  ili9341_WriteData(0x27);
-  ili9341_WriteData(0x04);
+	ili9341_WriteReg(LCD_PIXEL_FORMAT);
+  ili9341_WriteData(0x55);
+	ili9341_WriteReg(LCD_WDB);
+	ili9341_WriteData(0x00);
+	ili9341_WriteReg(LCD_TEOFF);
   
-  // Colomn address set 
-  ili9341_WriteReg(LCD_COLUMN_ADDR);
-  ili9341_WriteData(0x00);
-  ili9341_WriteData(0x00);
-  ili9341_WriteData(0x00);
-  ili9341_WriteData(0xEF);
+	//ili9341_WriteReg(LCD_RGBSET);
+	//for(unsigned int i = 0; i < 128;i++)
+	//{
+	//	ili9341_WriteData(i+2);
+	//}
+  //Colomn address set 
+  //ili9341_WriteReg(LCD_COLUMN_ADDR);
+  //ili9341_WriteData(0x00);
+  //ili9341_WriteData(0x00);
+  //ili9341_WriteData(0x00);
+  //ili9341_WriteData(0xEF);
   // Page address set 
-  ili9341_WriteReg(LCD_PAGE_ADDR);
-  ili9341_WriteData(0x00);
-  ili9341_WriteData(0x00);
-  ili9341_WriteData(0x01);
-  ili9341_WriteData(0x3F);
+  //ili9341_WriteReg(LCD_PAGE_ADDR);
+  //ili9341_WriteData(0x00);
+  //ili9341_WriteData(0x00);
+  //ili9341_WriteData(0x01);
+  //ili9341_WriteData(0x3F);
   ili9341_WriteReg(LCD_INTERFACE);
   ili9341_WriteData(0x01);
-  ili9341_WriteData(0x00);
+  ili9341_WriteData(0x10);
   ili9341_WriteData(0x06);
-  
-  ili9341_WriteReg(LCD_GRAM);
-  LCD_Delay(200);
-  
+ 
   ili9341_WriteReg(LCD_GAMMA);
   ili9341_WriteData(0x01);
   
@@ -152,8 +156,7 @@ void LCD_INIT(void)
   LCD_Delay(200);
   ili9341_WriteReg(LCD_DISPLAY_ON);
   /* GRAM start writing */
-  ili9341_WriteReg(LCD_GRAM);
-	
+	ili9341_WriteReg(LCD_GRAM);
 }
 void LCD_MCU_Read_Comand(unsigned char* parameters,unsigned char comand, unsigned char numb_of_parameters)
 {
