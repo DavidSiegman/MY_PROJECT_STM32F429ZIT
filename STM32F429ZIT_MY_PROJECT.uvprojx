@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F429xx,STM32F429X</Define>
               <Undefine></Undefine>
-              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD;.\INC\STARTUP</IncludePath>
+              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD;.\INC\STARTUP;.\INC\SDRAM;.\INC\FONTS</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -403,6 +403,13 @@
         </Group>
         <Group>
           <GroupName>GPIO</GroupName>
+          <Files>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\GPIO\gpio.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>STARTUP</GroupName>
@@ -477,6 +484,16 @@
               <FileType>1</FileType>
               <FilePath>.\SRC\LCD\lcd.c</FilePath>
             </File>
+            <File>
+              <FileName>text_draw_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\LCD\text_draw_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>text_draw_driver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\INC\LCD\text_draw_driver.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -486,6 +503,46 @@
               <FileName>spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SRC\SPI\spi.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDRAM</GroupName>
+          <Files>
+            <File>
+              <FileName>sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\SDRAM\sdram.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FONTS</GroupName>
+          <Files>
+            <File>
+              <FileName>font8.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\FONTS\font8.c</FilePath>
+            </File>
+            <File>
+              <FileName>font12.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\FONTS\font12.c</FilePath>
+            </File>
+            <File>
+              <FileName>font16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\FONTS\font16.c</FilePath>
+            </File>
+            <File>
+              <FileName>font20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\FONTS\font20.c</FilePath>
+            </File>
+            <File>
+              <FileName>font24.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\FONTS\font24.c</FilePath>
             </File>
           </Files>
         </Group>

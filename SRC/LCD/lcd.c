@@ -1,20 +1,53 @@
 #include "lcd.h"
 #include "spi.h"
+#include "gpio.h"
+#include "sdram.h"
+
+static GPIO_TypeDef* GPIOInitTable[] = {
+		GPIOB, GPIOA, GPIOA, GPIOB, GPIOG,
+		GPIOA, GPIOG, GPIOB, GPIOB, GPIOC, GPIOD,
+		GPIOG, GPIOG, GPIOA, GPIOB, GPIOB,
+		GPIOA, GPIOC, GPIOF, GPIOG,
+		0};
+
+static 	uint8_t const PINInitTable[] = {
+		0, 11, 12, 1, 6,
+		6, 10, 10, 11, 7, 3,
+		11, 12, 3, 8, 9,
+		4, 6, 10, 7,
+		0};
+
+static  uint8_t const AFInitTable[] = {
+		9, 14, 14, 9, 14,
+		14, 9, 14, 14, 14, 14,
+		14, 9, 14, 14, 14,
+		14, 14, 14, 14,
+		0};
 
 void LCD_INIT(void)
-{
-	//RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOCRST;
-	//RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOCRST;
-	RCC->AHB1ENR  |= RCC_AHB1ENR_GPIOCEN;
+{	
+	uint8_t i = 0;
+	/* GPIO pin configuration */
+	while(GPIOInitTable[i] != 0){
+		gpio_conf(GPIOInitTable[i], PINInitTable[i], MODE_AF, TYPE_PUSHPULL, SPEED_100MHz, PULLUP_NONE, AFInitTable[i]);
+		i++;
+	}
+	GPIOC->MODER &= ~(GPIO_MODER_MODE0_Msk << 10*2);
+	GPIOC->MODER |=  (GPIO_MODER_MODE0_0 << 10*2);
 	
-	//RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIODRST;
-	//RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIODRST;
-	RCC->AHB1ENR  |= RCC_AHB1ENR_GPIODEN;
+	GPIOC->OSPEEDR &= ~(GPIO_MODER_MODE0_Msk << 10*2);
+	GPIOC->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << 10*2);
+	GPIOC->BSRR    |= (1 << (10+16));
 	
+	GPIOD->MODER &= ~(GPIO_MODER_MODE0_Msk << 6*2);
+	GPIOD->MODER |=  (GPIO_MODER_MODE0_0 << 6*2);
+	
+	GPIOD->OSPEEDR &= ~(GPIO_MODER_MODE0_Msk << 6*2);
+	GPIOD->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << 6*2);
+	GPIOD->BSRR    |= (1 << (6+16));
 	// LCD_CSX_PIN Initialisation ================================================================== OUT
 	LCD_CSX_PORT->MODER &= ~(GPIO_MODER_MODE0_Msk << LCD_CSX_PIN*2);
 	LCD_CSX_PORT->MODER |=  (GPIO_MODER_MODE0_0 << LCD_CSX_PIN*2);
-	
 	LCD_CSX_PORT->OSPEEDR &= ~(GPIO_MODER_MODE0_Msk << LCD_CSX_PIN*2);
 	LCD_CSX_PORT->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << LCD_CSX_PIN*2);
 	LCD_CSX_PORT->BSRR    |= (1 << LCD_CSX_PIN);
@@ -35,11 +68,7 @@ void LCD_INIT(void)
 	MEM_CSX_PORT->OSPEEDR |=  (GPIO_MODER_MODE0_Msk << MEM_CSX_PIN*2);
 	MEM_CSX_PORT->BSRR    |= (1 << MEM_CSX_PIN);
 	/* Configure LCD */
-	
-  ili9341_WriteReg(0xCA);
-  ili9341_WriteData(0xC3);
-  ili9341_WriteData(0x08);
-  ili9341_WriteData(0x50);
+
   ili9341_WriteReg(LCD_POWERB);
   ili9341_WriteData(0x00);
   ili9341_WriteData(0xC1);
@@ -66,7 +95,7 @@ void LCD_INIT(void)
   ili9341_WriteData(0x00);
 	ili9341_WriteReg(LCD_DFC);
   ili9341_WriteData(0x01);
-  ili9341_WriteData(0x8F);
+  ili9341_WriteData(0xCF);
   ili9341_WriteData(0x27);
   ili9341_WriteData(0x04);
   ili9341_WriteReg(LCD_FRMCTR1);
@@ -157,6 +186,37 @@ void LCD_INIT(void)
   ili9341_WriteReg(LCD_DISPLAY_ON);
   /* GRAM start writing */
 	ili9341_WriteReg(LCD_GRAM);
+	
+	/* enable clock for LTDC */
+	RCC->APB2ENR 	   |= RCC_APB2ENR_LTDCEN;
+	/* Synchronization Size Configuration */
+	LTDC->SSCR 			= ((ILI9341_HSYNC - 1) << 16) 	| (ILI9341_VSYNC - 1);
+	/* Back Porch Configuration */
+	LTDC->BPCR 			= ((ILI9341_HSYNC + ILI9341_HBP - 1) << 16) 	| (ILI9341_VSYNC + ILI9341_VBP - 1);
+	/* Active Width Configuration */
+	LTDC->AWCR 			= ((ILI9341_HSYNC + ILI9341_HBP + ILI9341_LCD_PIXEL_WIDTH - 1) << 16) | (ILI9341_VSYNC + ILI9341_VBP + ILI9341_LCD_PIXEL_HEIGHT - 1);
+	/* Total Width Configuration */
+	LTDC->TWCR 			= ((ILI9341_HSYNC + ILI9341_HBP + ILI9341_LCD_PIXEL_WIDTH + ILI9341_HFP - 1) << 16) 	| (ILI9341_VSYNC + ILI9341_VBP + ILI9341_LCD_PIXEL_HEIGHT + ILI9341_VFP - 1);
+	/* Enable Layer */
+	LTDC_Layer1->CR 	= LTDC_LxCR_LEN;
+	LTDC->BCCR = 0x000000;
+	LTDC_Layer1->CACR   = (255);
+	/* Window Horizontal Position Configuration */
+	LTDC_Layer1->WHPCR  = (0x10D << 16) | 0x1E;
+	/* Window Vertical Position Configuration */
+	LTDC_Layer1->WVPCR  = (0x145 << 16) | 0x06;
+	/* Pixel Format Configuration */
+	LTDC_Layer1->PFCR   = 0x00;
+	/* Color Frame Buffer Address */
+	LTDC_Layer1->CFBAR  = SDRAM_BASE;
+	/* Color Frame Buffer Length */
+	LTDC_Layer1->CFBLR  = ((ILI9341_LCD_PIXEL_WIDTH * 4) << 16) | (ILI9341_LCD_PIXEL_WIDTH * 4 + 3);
+	LTDC_Layer1->CFBLNR = ILI9341_LCD_PIXEL_HEIGHT;
+	
+	/* Immediate Reload */
+	LTDC->SRCR 			= LTDC_SRCR_IMR;
+	/* Enable LTDC */
+	LTDC->GCR  			= LTDC_GCR_LTDCEN;
 }
 void LCD_MCU_Read_Comand(unsigned char* parameters,unsigned char comand, unsigned char numb_of_parameters)
 {
