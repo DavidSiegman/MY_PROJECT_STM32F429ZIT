@@ -1,7 +1,6 @@
 #include "lcd.h"
 #include "spi.h"
 #include "gpio.h"
-#include "sdram.h"
 
 static GPIO_TypeDef* GPIOInitTable[] = {
 		GPIOB, GPIOA, GPIOA, GPIOB, GPIOG,
@@ -197,9 +196,9 @@ void LCD_INIT(void)
 	LTDC->AWCR 			= ((ILI9341_HSYNC + ILI9341_HBP + ILI9341_LCD_PIXEL_WIDTH - 1) << 16) | (ILI9341_VSYNC + ILI9341_VBP + ILI9341_LCD_PIXEL_HEIGHT - 1);
 	/* Total Width Configuration */
 	LTDC->TWCR 			= ((ILI9341_HSYNC + ILI9341_HBP + ILI9341_LCD_PIXEL_WIDTH + ILI9341_HFP - 1) << 16) 	| (ILI9341_VSYNC + ILI9341_VBP + ILI9341_LCD_PIXEL_HEIGHT + ILI9341_VFP - 1);
-	/* Enable Layer */
-	LTDC_Layer1->CR 	= LTDC_LxCR_LEN;
+	
 	LTDC->BCCR = 0x000000;
+	
 	LTDC_Layer1->CACR   = (255);
 	/* Window Horizontal Position Configuration */
 	LTDC_Layer1->WHPCR  = (0x10D << 16) | 0x1E;
@@ -208,13 +207,33 @@ void LCD_INIT(void)
 	/* Pixel Format Configuration */
 	LTDC_Layer1->PFCR   = 0x00;
 	/* Color Frame Buffer Address */
-	LTDC_Layer1->CFBAR  = SDRAM_BASE;
+	LTDC_Layer1->CFBAR  = LAYER1_MEMORY_START_ADRESS;
 	/* Color Frame Buffer Length */
 	LTDC_Layer1->CFBLR  = ((ILI9341_LCD_PIXEL_WIDTH * 4) << 16) | (ILI9341_LCD_PIXEL_WIDTH * 4 + 3);
 	LTDC_Layer1->CFBLNR = ILI9341_LCD_PIXEL_HEIGHT;
 	
-	/* Immediate Reload */
-	LTDC->SRCR 			= LTDC_SRCR_IMR;
+	/* Enable Layer */
+	
+	
+	LTDC_Layer2->CACR   = (255);
+	/* Window Horizontal Position Configuration */
+	LTDC_Layer2->WHPCR  = (0x10D << 16) | 0x1E;
+	/* Window Vertical Position Configuration */
+	LTDC_Layer2->WVPCR  = (0x145 << 16) | 0x06;
+	/* Pixel Format Configuration */
+	LTDC_Layer2->PFCR   = 0x00;
+	/* Color Frame Buffer Address */
+	LTDC_Layer2->CFBAR  = LAYER2_MEMORY_START_ADRESS;
+	/* Color Frame Buffer Length */
+	LTDC_Layer2->CFBLR  = ((ILI9341_LCD_PIXEL_WIDTH * 4) << 16) | (ILI9341_LCD_PIXEL_WIDTH * 4 + 3);
+	LTDC_Layer2->CFBLNR = ILI9341_LCD_PIXEL_HEIGHT;
+	
+	/* Enable Layer */
+	LTDC_Layer2->CR 	= LTDC_LxCR_LEN;
+	LTDC_Layer1->CR 	= LTDC_LxCR_LEN;
+	
+	/* Immediate Reload LTDC_SRCR_VBR LTDC_SRCR_IMR*/
+	LTDC->SRCR 			= LTDC_SRCR_VBR;
 	/* Enable LTDC */
 	LTDC->GCR  			= LTDC_GCR_LTDCEN;
 }

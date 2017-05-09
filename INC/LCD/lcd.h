@@ -2,6 +2,7 @@
 #define __LCD_H
 
 #include "stm32f429xx.h"
+#include "sdram.h"
 
 #define LCD_CSX_PORT GPIOC
 #define LCD_CSX_PIN  2U
@@ -39,6 +40,11 @@
 #define  ILI9341_VSYNC            ((uint32_t)4)    /* Vertical synchronization   */
 #define  ILI9341_VBP              ((uint32_t)2)    /* Vertical back porch        */
 #define  ILI9341_VFP              ((uint32_t)4)    /* Vertical front porch       */
+
+#define LAYER1_MEMORY_START_ADRESS (SDRAM_BASE)
+#define LAYER1_MEMORY_SIZE (ILI9341_LCD_PIXEL_WIDTH*ILI9341_LCD_PIXEL_HEIGHT*4)
+#define LAYER2_MEMORY_START_ADRESS (SDRAM_BASE + LAYER1_MEMORY_SIZE)
+#define LAYER2_MEMORY_SIZE (LAYER1_MEMORY_SIZE)
 
 /** 
   * @brief  ILI9341 Registers  

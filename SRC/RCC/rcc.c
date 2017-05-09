@@ -35,15 +35,17 @@ void RCC_CLOCK_INIT(void)
 	}
 
 	RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLN_Msk;
-	RCC->PLLCFGR |= (180 << RCC_PLLCFGR_PLLN_Pos);          // 1 MHz * 180 = 180 MHz
+	RCC->PLLCFGR |= (360 << RCC_PLLCFGR_PLLN_Pos);          // 1 MHz * 360 = 360 MHz
 	
-	RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLP_Msk;                  // 180 MHz / 2 = 90 MHz === SYSCLK
+	RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLP_Msk;                  // 360 MHz / 2 = 180 MHz === SYSCLK
+	
+	SysTick->CTRL |= SysTick_CTRL_CLKSOURCE_Msk;
 	
 	RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLQ_Msk;
-	RCC->PLLCFGR |= (2 << RCC_PLLCFGR_PLLQ_Pos);            // 90 MHz / 2 = 45 MHz
+	RCC->PLLCFGR |= (8 << RCC_PLLCFGR_PLLQ_Pos);            // 360 MHz / 8 = 45 MHz
 	
-	RCC->CFGR &= ~RCC_CFGR_HPRE_Msk;							          // 90 MHz / 1 = 90 MHz === HCLK
-	RCC->CFGR |= (0x8 << RCC_CFGR_HPRE_Pos);                // 90 MHz / 2 = 45 MHz  === HCLK
+	RCC->CFGR &= ~RCC_CFGR_HPRE_Msk;							          // 180 MHz / 1 = 180 MHz === HCLK
+	RCC->CFGR |= (0x9 << RCC_CFGR_HPRE_Pos);                // 180 MHz / 4 = 45 MHz  === HCLK
 	
 	RCC->CFGR &= ~RCC_CFGR_PPRE1_Msk;
 	RCC->CFGR |= (0x0 << RCC_CFGR_PPRE1_Pos);               // 45 MHz / 1 = 45 MHz  === PCLK1
@@ -80,7 +82,7 @@ void RCC_CLOCK_INIT(void)
 	}
 	
 	RCC->PLLSAICFGR &= ~ RCC_PLLSAICFGR_PLLSAIN_Msk;
-	RCC->PLLSAICFGR |= (256 << RCC_PLLSAICFGR_PLLSAIN_Pos); // 1 MHz * 129 = 129 MHz
+	RCC->PLLSAICFGR |= (180 << RCC_PLLSAICFGR_PLLSAIN_Pos); // 1 MHz * 129 = 129 MHz
 	
 	RCC->PLLSAICFGR &= ~ RCC_PLLSAICFGR_PLLSAIQ_Msk;
 	RCC->PLLSAICFGR |= (2 << RCC_PLLSAICFGR_PLLSAIQ_Pos);   // 129 MHz / 2 = 64,5 MHz === PLLSAICLK
