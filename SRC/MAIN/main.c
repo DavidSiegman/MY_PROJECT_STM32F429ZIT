@@ -1,6 +1,7 @@
 #include "main.h"
 #include "rcc.h"
 #include "spi.h"
+#include "i2c.h"
 #include "lcd.h"
 #include "sdram.h"
 #include "fonts.h"
@@ -14,10 +15,14 @@ int main(void)
 	// INITIALISATION ========================================================
 	// =======================================================================
 	RCC_CLOCK_INIT();
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN |
                   RCC_AHB1ENR_GPIODEN | RCC_AHB1ENR_GPIOEEN | RCC_AHB1ENR_GPIOFEN |
                   RCC_AHB1ENR_GPIOGEN;
 	SDRAM_Init();
+	I2C3_Init();
+	static unsigned char u = 0x09;
+	I2C3_Send_Data(&u, 0x01);
 	int line = 0, alfa = 255;
 	for(unsigned int i = 0; i < ILI9341_LCD_PIXEL_WIDTH * ILI9341_LCD_PIXEL_HEIGHT;i++)
 	{

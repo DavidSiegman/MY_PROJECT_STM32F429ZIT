@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F429xx,STM32F429X</Define>
               <Undefine></Undefine>
-              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD;.\INC\STARTUP;.\INC\SDRAM;.\INC\FONTS</IncludePath>
+              <IncludePath>.\INC\CMSIS;.\INC\MAIN;.\INC\GPIO;.\INC\RCC;.\INC\FREERTOS;.\INC\SPI;.\INC\LCD;.\INC\STARTUP;.\INC\SDRAM;.\INC\FONTS;.\INC\I2C</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -538,6 +538,16 @@
               <FileName>font24.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SRC\FONTS\font24.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>I2C</GroupName>
+          <Files>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\I2C\i2c.c</FilePath>
             </File>
           </Files>
         </Group>
