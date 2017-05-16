@@ -21,8 +21,12 @@ int main(void)
                   RCC_AHB1ENR_GPIOGEN;
 	SDRAM_Init();
 	I2C3_Init();
-	static unsigned char u = 0x09;
-	I2C3_Send_Data(&u, 0x01);
+	static unsigned char u[10];
+	u[0] = 0;
+	I2C3_START(u, 0, I2C_WRITE_EV_STATE);
+	while(I2C3_GET_GLOBAL_STATE() != I2C_GLOBAL_STATE_REDY);
+	I2C3_START(u, 10, I2C_READ_EV_STATE);
+	while(I2C3_GET_GLOBAL_STATE() != I2C_GLOBAL_STATE_REDY);
 	int line = 0, alfa = 255;
 	for(unsigned int i = 0; i < ILI9341_LCD_PIXEL_WIDTH * ILI9341_LCD_PIXEL_HEIGHT;i++)
 	{
