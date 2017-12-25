@@ -46,6 +46,8 @@ void I2C3_Init(void)
 	EXTI->IMR  |= EXTI_IMR_MR15;
 	EXTI->FTSR |= EXTI_FTSR_TR15;
 	
+	NVIC_EnableIRQ(EXTI15_10_IRQn);
+	
 	I2C3->CR1  |= I2C_CR1_SWRST;
 	I2C3->CR1  &= ~I2C_CR1_SWRST;
 	
@@ -81,7 +83,7 @@ unsigned char I2C3_GET_GLOBAL_STATE(void)
 // mode - режим, 0-передача 1-приём
 void I2C3_START(unsigned char adress, unsigned char* data_a, unsigned char data_ln, unsigned char mode)
 {
-	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_BUSY; // Статус отслеживания начала и окончания передачи в состояние "BUSY"
+	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_BUSY; // Статус в состояние "BUSY"
 	I2C3_Struct.reg_adress = adress;
 	I2C3_Struct.data = data_a;
 	I2C3_Struct.data_len = data_ln;
@@ -96,7 +98,7 @@ void I2C3_STOP(void)
 {
 	I2C3->CR1  |= I2C_CR1_STOP;
 	NVIC_DisableIRQ(I2C3_EV_IRQn);
-	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_REDY; // Статус отслеживания начала и окончания передачи в состояние "REDY"
+	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_REDY; // Статус в состояние "REDY"
 }
 
 // Event interrupt

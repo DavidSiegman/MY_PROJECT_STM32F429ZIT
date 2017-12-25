@@ -6,6 +6,7 @@
 #include "sdram.h"
 #include "fonts.h"
 #include "text_draw_driver.h"
+#include "touchscreen.h"
 #include "cmsis_os.h"
 		
 void MAINTimer_Callback(void const *pvParametrs);
@@ -21,15 +22,7 @@ int main(void)
                   RCC_AHB1ENR_GPIOGEN;
 	SDRAM_Init();
 	I2C3_Init();
-	static unsigned char u[98];
-	u[0] = 0x01;
-	u[1] = 0x02;
-	I2C3_START(0x12, u, 1, I2C_WRITE_EV_STATE);
-	while(I2C3_GET_GLOBAL_STATE() != I2C_GLOBAL_STATE_REDY);
-	I2C3_START(0x00, u, 0, I2C_WRITE_EV_STATE);
-	while(I2C3_GET_GLOBAL_STATE() != I2C_GLOBAL_STATE_REDY);
-	I2C3_START(0x00, u, 98, I2C_READ_EV_STATE);
-	while(I2C3_GET_GLOBAL_STATE() != I2C_GLOBAL_STATE_REDY);
+	Init_TouchScreenController();
 	int line = 0, alfa = 255;
 	for(unsigned int i = 0; i < ILI9341_LCD_PIXEL_WIDTH * ILI9341_LCD_PIXEL_HEIGHT;i++)
 	{
