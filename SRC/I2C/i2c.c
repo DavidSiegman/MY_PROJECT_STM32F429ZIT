@@ -46,7 +46,9 @@ void I2C3_Init(void)
 	EXTI->IMR  |= EXTI_IMR_MR15;
 	EXTI->FTSR |= EXTI_FTSR_TR15;
 	
-	I2C3->CR1  |=  I2C_CR1_ACK;
+	I2C3->CR1  |= I2C_CR1_SWRST;
+	I2C3->CR1  &= ~I2C_CR1_SWRST;
+	
 	I2C3->CR2  &= ~ I2C_CR2_FREQ_Msk;
 	I2C3->CR2  |= (40 << I2C_CR2_FREQ_Pos); // 40MHz
 	I2C3->CR2  |= I2C_CR2_ITEVTEN;
@@ -65,6 +67,7 @@ void I2C3_Init(void)
 	I2C3->TRISE = 12;
 	I2C3->FLTR |= 0x01;
 	I2C3->CR1  |= I2C_CR1_PE;
+	
 }
 
 unsigned char I2C3_GET_GLOBAL_STATE(void)
@@ -72,9 +75,14 @@ unsigned char I2C3_GET_GLOBAL_STATE(void)
 	return I2C3_Struct.GLOBAL_STATE;
 }
 
-void I2C3_START(unsigned char* data_a, unsigned char data_ln, unsigned char mode)
+// Запуск передачи данных
+// *data_a - буфер
+// data_ln - количество байт данных
+// mode - режим, 0-передача 1-приём
+void I2C3_START(unsigned char adress, unsigned char* data_a, unsigned char data_ln, unsigned char mode)
 {
-	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_BUSY;
+	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_BUSY; // Статус отслеживания начала и окончания передачи в состояние "BUSY"
+	I2C3_Struct.reg_adress = adress;
 	I2C3_Struct.data = data_a;
 	I2C3_Struct.data_len = data_ln;
 	I2C3_Struct.data_index = 0;
@@ -88,36 +96,9 @@ void I2C3_STOP(void)
 {
 	I2C3->CR1  |= I2C_CR1_STOP;
 	NVIC_DisableIRQ(I2C3_EV_IRQn);
-	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_REDY;
+	I2C3_Struct.GLOBAL_STATE = I2C_GLOBAL_STATE_REDY; // Статус отслеживания начала и окончания передачи в состояние "REDY"
 }
 
-void I2C3_Read_Data(unsigned char* data, unsigned char reg_adress, unsigned char data_len)
-{
-	I2C3->CR1  |= I2C_CR1_START;
-	while(!(I2C3->SR1 & I2C_SR1_SB));
-	I2C3->DR = STMPE811_Adress;
-	while(!(I2C3->SR1 & I2C_SR1_ADDR));
-	I2C3->DR = reg_adress;
-	while(!(I2C3->SR1 & I2C_SR1_TXE));
-	I2C3->CR1 |= I2C_CR1_STOP;
-	I2C3->CR1  |= I2C_CR1_START;
-	while(!(I2C3->SR1 & I2C_SR1_SB));
-	I2C3->DR = STMPE811_Adress | 1;
-	while(!(I2C3->SR1 & I2C_SR1_ADDR));
-	for (unsigned int i = 0; i < data_len; i++)
-	{
-		if (i < data_len-1)
-		{
-			I2C3->CR1  |= I2C_CR1_ACK;
-		}
-		else
-		{
-			I2C3->CR1 |= I2C_CR1_STOP;
-		}
-		while(!(I2C3->SR1 & I2C_SR1_RXNE));
-		data[i] = I2C3->DR;
-	}
-}
 // Event interrupt
 void I2C3_EV_IRQHandler(void)
 {
@@ -129,47 +110,112 @@ void I2C3_EV_IRQHandler(void)
 	{
 		if (I2C3_Struct.RW_Mode == I2C_WRITE_EV_STATE)
 		{
-			I2C3->DR = I2C3_Struct.reg_adress;
+			if ((I2C3->SR2 & I2C_SR2_TRA))
+			{
+				I2C3->DR = I2C3_Struct.reg_adress;
+			}
 		}
 		else if (I2C3_Struct.RW_Mode == I2C_READ_EV_STATE)
 		{
-			if (I2C3_Struct.data_len > 1)
+			if (I2C3_Struct.data_len > 2)
 			{
 				I2C3->CR1  |= I2C_CR1_ACK;
+				I2C3->CR1  &= ~I2C_CR1_POS;
+				if (!(I2C3->SR2 & I2C_SR2_TRA))
+				{
+					
+				}
+				I2C3_Struct.data_len--;
 			}
-			else
+			else if (I2C3_Struct.data_len == 2)
+			{
+				I2C3->CR1  |= I2C_CR1_ACK;
+				I2C3->CR1  |= I2C_CR1_POS;
+				if (!(I2C3->SR2 & I2C_SR2_TRA))
+				{
+					
+				}
+				I2C3_Struct.data_len--;
+			}
+			else if (I2C3_Struct.data_len == 1)
 			{
 				I2C3->CR1  &= ~I2C_CR1_ACK;
+				I2C3->CR1  &= ~I2C_CR1_POS;
+				if (!(I2C3->SR2 & I2C_SR2_TRA))
+				{
+					
+				}
+				I2C3_Struct.data_len--;
 			}
-			//I2C3->DR = *(I2C3_Struct.data + I2C3_Struct.data_index);
+			else if (I2C3_Struct.data_len == 0)
+			{
+				I2C3->CR1  &= ~I2C_CR1_ACK;
+				I2C3->CR1  &= ~I2C_CR1_POS;
+				//I2C3_STOP();
+				if (!(I2C3->SR2 & I2C_SR2_TRA))
+				{
+					
+				}
+			}
+			
 		}
-		//NVIC_DisableIRQ(I2C3_EV_IRQn);
 	}
-	if((I2C3->SR1 & I2C_SR1_RXNE))
+
+	if((I2C3->SR1 & I2C_SR1_RXNE)&& !(I2C3->SR2 & I2C_SR2_TRA))
 	{
-		I2C3->CR1  |= I2C_CR1_ACK;
-		if (I2C3_Struct.data_len > 0)
+		if (I2C3_Struct.data_len > 1)
 		{
+			if ((I2C3->SR1 & I2C_SR1_BTF))
+		   {
+				I2C3->CR1  |= I2C_CR1_ACK;
+				I2C3->CR1  &= ~I2C_CR1_POS;
+				*(I2C3_Struct.data + I2C3_Struct.data_index) = I2C3->DR;
+				I2C3_Struct.data_index++;
+				I2C3_Struct.data_len--;
+			}
+		}
+		else if (I2C3_Struct.data_len == 1)
+		{
+			if ((I2C3->SR1 & I2C_SR1_BTF))
+		   {
+				*(I2C3_Struct.data + I2C3_Struct.data_index) = I2C3->DR;
+				I2C3_Struct.data_index++;
+				I2C3_Struct.data_len--;
+				I2C3->CR1  &= ~I2C_CR1_ACK;
+				I2C3->CR1  &= ~I2C_CR1_POS;
+				I2C3_STOP();
+				*(I2C3_Struct.data + I2C3_Struct.data_index) = I2C3->DR;
+				I2C3_Struct.data_index = 0;
+				I2C3_Struct.data_len   = 0;
+			}
+		}
+		else if (I2C3_Struct.data_len == 0)
+		{
+			I2C3->CR1  &= ~I2C_CR1_ACK;
+			I2C3->CR1  &= ~I2C_CR1_POS;
+			I2C3_STOP();
 			*(I2C3_Struct.data + I2C3_Struct.data_index) = I2C3->DR;
-			I2C3_Struct.data_index++;
-			I2C3_Struct.data_len--;
-		}
-		else if (I2C3_Struct.data_len == 0)
-		{
-			I2C3_STOP();
+			I2C3_Struct.data_index = 0;
+			I2C3_Struct.data_len   = 0;
 		}
 	}
-	if((I2C3->SR1 & I2C_SR1_TXE))
+	else if((I2C3->SR1 & I2C_SR1_TXE)&&(I2C3->SR2 & I2C_SR2_TRA))
 	{
 		if (I2C3_Struct.data_len > 0)
 		{
-			I2C3->DR = *(I2C3_Struct.data + I2C3_Struct.data_index);
-			I2C3_Struct.data_index++;
-			I2C3_Struct.data_len--;
+			if(I2C3->SR1 & I2C_SR1_BTF)
+			{
+				I2C3->DR = *(I2C3_Struct.data + I2C3_Struct.data_index);
+				I2C3_Struct.data_index++;
+				I2C3_Struct.data_len--;
+			}
 		}
 		else if (I2C3_Struct.data_len == 0)
 		{
-			I2C3_STOP();
+			if(I2C3->SR1 & I2C_SR1_BTF)
+			{
+				I2C3_STOP();
+			}
 		}
 	}
 }

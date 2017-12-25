@@ -18,10 +18,12 @@ enum
 {
 	I2C_WRITE_EV_STATE = 0,
 	I2C_READ_EV_STATE,
+	
 	I2C_IDLE_STATE,
 	I2C_START_EV_STATE,
 	I2C_ADRESS_EV_STATE,
 	I2C_STOP_EV_STATE,
+
 	I2C_GLOBAL_STATE_BUSY,
 	I2C_GLOBAL_STATE_REDY,
 };
@@ -38,9 +40,7 @@ typedef struct
 }I2C3_Structur;
 
 void I2C3_Init(void);
-void I2C3_START(unsigned char* data_a, unsigned char data_ln, unsigned char mode);
-void I2C3_Send_Data(unsigned char* data, unsigned char reg_adress, unsigned char data_len);
-void I2C3_Read_Data(unsigned char* data, unsigned char reg_adress, unsigned char data_len);
+void I2C3_START(unsigned char adress, unsigned char* data_a, unsigned char data_ln, unsigned char mode);
 unsigned char I2C3_GET_GLOBAL_STATE(void);
 
 #endif /* end __I2S_H */
